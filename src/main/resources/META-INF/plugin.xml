@@ -1,0 +1,18 @@
+<idea-plugin>
+    <id>com.example.MyPlugin</id>
+    <name>Word Length Calculator</name>
+    <vendor>YourName</vendor>
+    <description>Calculate length of selected words in PyCharm</description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <actions>
+        <action id="WordLengthAction"
+                class="WordLengthAction"
+                text="Calculate Word Length"
+                description="Calculate the length of selected words">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt L"/>
+        </action>
+    </actions>
+</idea-plugin>
