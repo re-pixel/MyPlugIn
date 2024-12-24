@@ -14,21 +14,18 @@ repositories {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-//    version.set("2024.3.1")
+    version.set("2024.3.1")
     type.set("PY") // Target IDE Platform
-    localPath.set("C:/Program Files/JetBrains/PyCharm 2024.3.1")
+    //localPath.set("C:/Program Files/JetBrains/PyCharm 2024.3.1")
     plugins.set(listOf())
-
-    downloadSources.set(true) // Ensure sources are available
-    instrumentCode.set(true)
 }
 
 dependencies {
     implementation("org.jetbrains:annotations:23.0.0")
 }
 
+
 tasks {
-    // Set the JVM compatibility versions
     withType<JavaCompile> {
         sourceCompatibility = "21"
         targetCompatibility = "21"

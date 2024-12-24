@@ -1,58 +1,50 @@
-
-import com.intellij.openapi.project.Project;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import com.intellij.openapi.util.io.FileUtil;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 public class WordLengthRunner {
-    private Project project;
-
-    public WordLengthRunner(Project project) {
-        this.project = project;
-    }
 
     public String runWordLengthScript(String selectedText) throws Exception {
-        // Create a temporary Python script
-        Path tempScript = createTempPythonScript(selectedText);
+        String scriptPath = getScriptFromResources();
+        if (scriptPath == null) {
+            throw new IllegalStateException("Could not find Python script in resources");
+        }
 
-        // Run the Python script
-        Process process = Runtime.getRuntime().exec(new String[]{"python", tempScript.toString()});
-
-        // Capture the output
-        String output = new BufferedReader(new InputStreamReader(process.getInputStream()))
-                .lines()
-                .collect(Collectors.joining("\n"));
-
-        // Wait for the process to complete
-        process.waitFor();
-
-        // Delete the temporary script
-        Files.delete(tempScript);
-
-        return output;
-    }
-
-    private Path createTempPythonScript(String selectedText) throws Exception {
-        // Create a temporary Python script
-        Path tempScript = Files.createTempFile("word_length_", ".py");
-
-        // Write the script content
-        String scriptContent = String.format(
-                "# Temporary word length script\n" +
-                        "text = '''\n%s\n'''\n" +
-                        "words = text.split()\n" +
-                        "for word in words:\n" +
-                        "    print(f'{word}: {len(word)} characters')\n",
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                "python",
+                scriptPath,
                 selectedText
         );
 
-        // Write the content to the temporary script
-        Files.write(tempScript, scriptContent.getBytes(), StandardOpenOption.CREATE);
+        processBuilder.redirectErrorStream(true);
+        Process process = processBuilder.start();
 
-        return tempScript;
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+            String output = reader.lines().collect(Collectors.joining("\n"));
+
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                throw new RuntimeException("Python script failed with exit code: " + exitCode);
+            }
+
+            return output;
+        }
+    }
+
+    private String getScriptFromResources() throws IOException {
+        // Get the script from resources and copy it to a temporary location
+        // This is necessary because we can't execute directly from the JAR
+        InputStream scriptStream = getClass().getResourceAsStream("/python/word_length_script.py");
+        if (scriptStream == null) {
+            return null;
+        }
+
+        File tempScript = File.createTempFile("word_length_script", ".py");
+        tempScript.deleteOnExit();
+        FileUtil.copy(scriptStream, new FileOutputStream(tempScript));
+
+        return tempScript.getAbsolutePath();
     }
 }
