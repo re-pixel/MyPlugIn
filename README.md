@@ -125,18 +125,3 @@ The plugin is configured via `plugin.xml`:
 - **Keyboard Shortcut**: `Alt+L`
 - **Context Menu**: Available in editor popup menu
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit issues or pull requests.
-
-## License
-
-This project is available under the terms specified by the repository owner.
-
-## Version
-
-Current version: 2.0
-
-## Support
-
-For issues, questions, or suggestions, please open an issue on the GitHub repository.
